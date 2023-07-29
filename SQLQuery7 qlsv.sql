@@ -307,3 +307,261 @@ TenKH AS 'Tên khoa'
 FROM dbo.SinhVien JOIN dbo.Khoa 
 ON Khoa.MaKH = SinhVien.MaKH
 go
+
+-----2----
+--1--
+SELECT 
+HoSV,
+TenSV
+,[Giới tính] = CASE WHEN Phai=1 THEN N'Nữ'
+					WHEN Phai =0 THEN 'Nam'
+					END	
+					,
+[Tuổi]=YEAR(GETDATE())-YEAR(NgaySinh),
+MaKH
+FROM dbo.SinhVien
+ORDER BY Tuổi DESC
+GO	
+
+--2--
+SELECT 
+HoSV,TenSV,Phai,[Ngày sinh]=DAY(NgaySinh)
+FROM dbo.SinhVien
+WHERE MONTH(NgaySinh) =02 AND YEAR(NgaySinh)=1994
+GO
+
+--3--
+SELECT [Ngày sinh] =DAY(NgaySinh) FROM dbo.SinhVien
+ORDER BY [Ngày sinh] DESC
+GO
+--4--
+SELECT 
+MaSV,
+Phai,
+MaKH,
+[Mức học bổng]= CASE 
+					WHEN HocBong>500000 THEN N'Học bổng cao'
+					ELSE N'Mức trung bình'
+				END	
+
+FROM dbo.SinhVien
+GO
+--5--
+SELECT 
+HoSV,
+TenSV,
+MaMH,
+Diem
+FROM dbo.SinhVien 
+JOIN	dbo.Ketqua ON	Ketqua.MaSV = SinhVien.MaSV
+ORDER BY HoSV,TenSV,MaMH
+GO
+
+--6--
+SELECT 
+HoSV,TenSV,
+[Giới tính]= CASE WHEN Phai =1 THEN N'Nữ'
+				WHEN Phai =0 THEN 'Nam'
+				END,
+TenKH
+FROM dbo.SinhVien 
+JOIN dbo.Khoa ON	Khoa.MaKH = SinhVien.MaKH
+WHERE SinhVien.MaKH ='AV'
+GO
+
+--7--
+SELECT 
+TenKH  ,
+HoSV,
+TenKH,
+TenMH,
+Sotiet,
+Diem
+
+FROM dbo.SinhVien 
+JOIN dbo.Khoa ON	Khoa.MaKH = SinhVien.MaKH
+JOIN dbo.Ketqua ON Ketqua.MaSV = SinhVien.MaSV
+JOIN dbo.MonHoc ON MonHoc.MaMH = Ketqua.MaMH
+WHERE Khoa.MaKH ='TH'
+GO
+
+--8--
+SELECT 
+HoSV,TenSV,MaKH,TenMH,
+Diem,
+[Loại]= CASE WHEN Diem>8 THEN 'Giỏi'
+			WHEN Diem <=8 AND Diem>=6 THEN	'Khá'
+			WHEN Diem <6 THEN 'Trung bình'
+			END	
+			 
+
+FROM dbo.SinhVien 
+JOIN dbo.Ketqua ON Ketqua.MaSV = SinhVien.MaSV
+JOIN	 dbo.MonHoc ON MonHoc.MaMH = Ketqua.MaMH
+GO
+
+-------3-------
+--1--
+SELECT 
+MonHoc.MaMH,
+TenMH,
+[Điểm trung bình]=AVG(Diem)
+FROM dbo.MonHoc 
+JOIN dbo.Ketqua ON Ketqua.MaMH = MonHoc.MaMH
+GROUP BY MonHoc.MaMH,
+         TenMH
+GO
+
+--2--
+SELECT 
+HoSV,TenSV, TenKH,
+[Tổng số môn thi]= COUNT(TenMH)
+FROM dbo.SinhVien 
+JOIN dbo.Ketqua ON Ketqua.MaSV = SinhVien.MaSV
+JOIN dbo.MonHoc ON MonHoc.MaMH = Ketqua.MaMH
+JOIN dbo.Khoa ON Khoa.MaKH = SinhVien.MaKH
+GROUP BY HoSV,
+         TenSV,
+         TenKH
+GO
+
+
+--3--
+SELECT 
+TenSV,
+TenKH,
+Phai,
+SUM(Diem)AS 'Tổng điểm thi'
+
+FROM dbo.SinhVien 
+JOIN dbo.Khoa ON Khoa.MaKH = SinhVien.MaKH
+JOIN dbo.Ketqua ON Ketqua.MaSV = SinhVien.MaSV
+GROUP BY TenSV,
+         TenKH,
+         Phai
+GO
+
+--4--
+SELECT TenKH,[Tổng số sinh viên]=count(MaSV) 
+FROM dbo.Khoa 
+JOIN dbo.SinhVien ON SinhVien.MaKH = Khoa.MaKH
+GROUP BY TenKH
+GO
+
+--5--
+SELECT HoSV,TenSV,MAX(Diem)
+FROM dbo.SinhVien 
+JOIN dbo.Ketqua ON Ketqua.MaSV = SinhVien.MaSV
+GROUP BY HoSV,
+         TenSV
+GO
+
+--6--
+SELECT TOP 1 TenMH,Sotiet FROM dbo.MonHoc
+ORDER BY Sotiet DESC
+GO	
+
+--7--
+SELECT SinhVien.MaKH, TenKH,[Học bổng cao nhất]=MAX(HocBong) 
+FROM dbo.Khoa 
+JOIN dbo.SinhVien ON SinhVien.MaKH = Khoa.MaKH
+GROUP BY SinhVien.MaKH,
+         TenKH
+GO
+
+--8--
+SELECT TenMH,MAX(Diem) FROM dbo.MonHoc 
+JOIN dbo.Ketqua ON Ketqua.MaMH = MonHoc.MaMH 
+GROUP BY TenMH
+GO
+
+
+--9--
+SELECT 
+MonHoc.MaMH,TenMH,
+[Số sinh viên đang học]=COUNT(SinhVien.MaSV)
+FROM dbo.MonHoc 
+JOIN dbo.Ketqua ON Ketqua.MaMH = MonHoc.MaMH
+JOIN dbo.SinhVien ON SinhVien.MaSV = Ketqua.MaSV
+GROUP BY MonHoc.MaMH,
+         TenMH
+GO
+
+--10--
+SELECT TOP 2 TenMH ,  Sotiet,TenSV , Diem FROM dbo.MonHoc JOIN dbo.Ketqua ON Ketqua.MaMH = MonHoc.MaMH
+JOIN dbo.SinhVien ON SinhVien.MaSV = Ketqua.MaSV
+ 
+GROUP BY TenMH,
+         Sotiet,
+         TenSV,Diem
+ORDER BY Diem DESC
+GO
+
+--11--
+SELECT TOP 1
+SinhVien.MaKH,
+TenKH,
+COUNT(MaSV)
+FROM dbo.Khoa JOIN dbo.SinhVien ON SinhVien.MaKH = Khoa.MaKH
+GROUP BY SinhVien.MaKH,
+         TenKH
+		 GO
+
+--12--
+SELECT  TOP 1
+
+TenKH,
+HoSV,TenSV,
+MAX(HocBong) AS'Học bổng'
+FROM dbo.SinhVien JOIN dbo.Khoa
+ ON Khoa.MaKH = SinhVien.MaKH     
+ GROUP BY TenKH,
+          HoSV,
+          TenSV ,HocBong
+ORDER BY HocBong DESC
+GO
+
+--13--
+SELECT TOP 1
+MaSV,HoSV,TenSV,TenKH,MAX(HocBong )AS 'Học bổng'
+FROM dbo.SinhVien
+JOIN dbo.Khoa ON Khoa.MaKH = SinhVien.MaKH
+WHERE SinhVien.MaKH='TH'
+GROUP BY MaSV,
+         HoSV,
+         TenSV,
+         TenKH,HocBong
+ORDER BY HocBong DESC
+GO
+
+--14--
+SELECT TOP 1
+HoSV,TenSV, 
+MIN(Diem)
+FROM dbo.SinhVien 
+JOIN dbo.Ketqua ON Ketqua.MaSV = SinhVien.MaSV JOIN dbo.MonHoc ON  MonHoc.MaMH = Ketqua.MaMH
+WHERE Ketqua.MaMH =01
+GROUP BY HoSV,
+         TenSV,Diem
+ORDER BY  Diem 
+GO
+
+--15--
+SELECT TOP 3  
+HoSV,TenSV,TenKH,TenMH,
+Diem
+
+FROM dbo.SinhVien 
+JOIN dbo.Ketqua ON Ketqua.MaSV = SinhVien.MaSV 
+JOIN dbo.Khoa ON Khoa.MaKH = SinhVien.MaKH
+JOIN dbo.MonHoc ON MonHoc.MaMH = Ketqua.MaMH
+WHERE Ketqua.MaMH = 04
+GROUP BY HoSV,
+         TenSV,
+         TenKH,
+         TenMH,
+         Diem
+ORDER BY Diem 
+GO
+
+--16--
