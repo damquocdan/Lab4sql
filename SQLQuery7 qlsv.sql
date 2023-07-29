@@ -259,3 +259,51 @@ SELECT HoSV AS 'Họ', TenSV AS 'Tên', NoiSinh AS 'Nơi sinh', NgaySinh AS 'Ng�
 WHERE NoiSinh  LIKE '%Hà%' AND	 NgaySinh >'1990-01-01'
 GO	
 --23--
+SELECT * FROM dbo.SinhVien 
+WHERE Phai =1 AND TenSV LIKE '%N%'
+GO
+
+
+--24--
+SELECT * FROM dbo.SinhVien
+WHERE Phai =0 AND NgaySinh >'1986-05-30'
+GO
+
+--25--
+SELECT HoSV AS 'Họ', TenSV AS 'Tên',
+[Giới tính] = CASE WHEN Phai =1 THEN N'Nữ'
+					WHEN phai =0 THEN 'Nam'
+					END	
+					,
+					NgaySinh AS 'Ngày sinh'
+FROM dbo.SinhVien
+GO
+--26--
+SELECT  
+MaSV AS 'Mã sinh viên',
+[Tuổi]=YEAR(GETDATE())-YEAR(NgaySinh),
+NoiSinh AS 'nơi sinh',
+MaKH AS 'Mã khoa'
+FROM dbo.SinhVien
+GO
+
+--27--
+SELECT 
+HoSV AS 'Họ ',
+TenSV AS' Tên',
+[Tuổi] = YEAR(GETDATE())-YEAR(NgaySinh),
+HocBong AS 'Học bổng'
+FROM dbo.SinhVien
+WHERE YEAR(GETDATE())-YEAR(NgaySinh)>30
+GO
+
+--28--
+SELECT 
+HoSV AS 'Họ',
+TenSV AS 'Tên',
+[Tuổi] = YEAR(GETDATE())-YEAR(NgaySinh),
+TenKH AS 'Tên khoa'
+
+FROM dbo.SinhVien JOIN dbo.Khoa 
+ON Khoa.MaKH = SinhVien.MaKH
+go
