@@ -565,3 +565,21 @@ ORDER BY Diem
 GO
 
 --16--
+SELECT TOP 1
+Khoa.MaKH ,
+TenKH
+FROM dbo.Khoa 
+JOIN dbo.SinhVien	ON SinhVien.MaKH = Khoa.MaKH
+WHERE Phai =1
+ORDER BY Phai DESC
+GO	
+
+--17-- 
+SELECT 
+Khoa.MaKH,
+TenKH,[Tong so sinh vien] =(SELECT COUNT(MaSV) FROM dbo.SinhVien WHERE Khoa.MaKH = SinhVien.MaKH ),
+[tong so sinh vien nu]=(SELECT COUNT(MaSV) FROM dbo.SinhVien WHERE  Khoa.MaKH = SinhVien.MaKH AND	 Phai=1)
+FROM dbo.Khoa 
+JOIN dbo.SinhVien ON SinhVien.MaKH = Khoa.MaKH
+go
+
